@@ -1,0 +1,148 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css" />
+    <style>
+      .status-1 {
+        background-color: #ed8077;
+      }
+      .status-2 {
+        background-color: #4488c5;
+      }
+      .status-3 {
+        background-color: #5eb5a6;
+      }
+      .card {
+        margin-bottom: 5px;
+      }
+      .card-footer-item {
+        padding-top: 0px;
+        padding-bottom: 0px;
+      }
+      .status-1 {
+        background-color: #ed8077;
+      }
+      .status-2 {
+        background-color: #4488c5;
+      }
+      .status-3 {
+        background-color: #5eb5a6;
+      }
+      .card {
+        margin-bottom: 5px;
+      }
+      .card-footer-item {
+        padding-top: 0px;
+        padding-bottom: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="section" id="board">
+      <div class="container">
+        <div class="columns">
+          <div class="column status-1">
+            <div class="tags has-addons">
+              <span class="tag">未対応</span>
+              <span class="tag is-dark">{{ tasks.tasksOpen }}</span>
+            </div>
+
+            <task-card :task="task" v-for="task in tasksOpen" :key="task.name"></task-card>
+
+          </div>
+          <div class="column status-2">
+            <div class="tags has-addons">
+              <span class="tag">処理中</span>
+              <span class="tag is-dark">{{ tasks.tasksDoing}}</span>
+            </div>
+
+            <task-card :task="task" v-for="task in tasksDoing" :key="task.name"></task-card>
+
+          </div>
+          <div class="column status-3">
+            <div class="tags has-addons">
+              <span class="tag">完了</span>
+              <span class="tag is-dark">{{ tasks.tasksClosed }}</span>
+            </div>
+
+            <task-card :task="task" v-for="task in tasksClosed" :key="task.name"></task-card>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script>
+      console.log('test');
+      var filters = {
+      	open: function (tasks) {
+        	return tasks.filter(function (task) {
+          	return task.status === 1
+          })
+        },
+      	doing: function (tasks) {
+        	return tasks.filter(function (task) {
+          	return task.status === 2
+          })
+        },
+        closed: function (tasks) {
+        	return tasks.filter(function (task) {
+          	return task.status === 3
+          })
+        }
+      }
+      Vue.component('task-card', {
+        props: ['task'],
+        template: `<div class="card">
+                  <div class="card-content">
+                    {{ task.name }}
+                  </div>
+                  <footer class="card-footer">
+                    <div class="card-footer-item">
+                      {{ task.assignee }}
+                    </div>
+                    <div class="card-footer-item">
+                      {{ task.mandays }} 人日
+                    </div>
+                  </footer>
+                  <footer class="card-footer">
+                    <a class="card-footer-item" v-on:click="decrementStatus(task)">◀︎</a>
+                    <a class="card-footer-item" v-on:click="incrementStatus(task)">▶︎</a>
+                  </footer>
+                </div>`,
+          methods: {
+            incrementStatus: function (task) {
+            if(1 <= task.status && task.status <= 2) {
+            	task.status++
+            }
+          },
+            decrementStatus: function (task) {
+            if(2 <= task.status && task.status <= 3) {
+            	task.status--
+            }
+          }
+        }
+      })
+      new Vue({
+      	el: '#board',
+        data: {
+          tasks: [
+            { name: 'task 1', status: 1, assignee: '🐱', mandays: 3 },
+            { name: 'task 2', status: 1, assignee: '🐶', mandays: 2 },
+            { name: 'task 3', status: 2, assignee: '🐱', mandays: 1 },
+            { name: 'task 4', status: 3, assignee: '🐹', mandays: 1 }
+          ]
+        },
+        computed: {
+          tasksOpen() {
+            return filters.open(this.tasks)
+          },
+          tasksDoing() {
+            return filters.doing(this.tasks)
+          },
+          tasksClosed() {
+            return filters.closed(this.tasks)
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
