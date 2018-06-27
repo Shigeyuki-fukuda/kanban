@@ -35,19 +35,35 @@
         padding-top: 0px;
         padding-bottom: 0px;
       }
+      .fade-enter-active, .fade-leave-active {
+        transition: opacity 0.7s
+      }
+      .fade-enter, .fade-leave-to {
+        opacity: 0
+      }
     </style>
   </head>
   <body>
     <section class="section" id="board">
       <div class="container">
+        <input type="text" v-model="newTaskName" />
+          <select v-model="newTaskAssignee">
+            <option value="🐱">🐱</option>
+            <option value="🐶">🐶</option>
+            <option value="🐹">🐹</option>
+          </select>
+        <input type="number" v-model="newTaskMandays" />
+        <button @click="addTask">追加</button>
+        <hr>
         <div class="columns">
           <div class="column status-1">
             <div class="tags has-addons">
               <span class="tag">未対応</span>
               <span class="tag is-dark">{{ tasks.tasksOpen }}</span>
             </div>
-
-            <task-card :task="task" v-for="task in tasksOpen" :key="task.name"></task-card>
+            <transition-group name="fade">
+              <task-card :task="task" v-for="task in tasksOpen" :key="task.name"></task-card>
+            </transition-group>
 
           </div>
           <div class="column status-2">
@@ -55,17 +71,18 @@
               <span class="tag">処理中</span>
               <span class="tag is-dark">{{ tasks.tasksDoing}}</span>
             </div>
-
-            <task-card :task="task" v-for="task in tasksDoing" :key="task.name"></task-card>
-
+            <transition-group name="fade">
+              <task-card :task="task" v-for="task in tasksDoing" :key="task.name"></task-card>
+          </transition-group>
           </div>
           <div class="column status-3">
             <div class="tags has-addons">
               <span class="tag">完了</span>
               <span class="tag is-dark">{{ tasks.tasksClosed }}</span>
             </div>
-
+          <transition-group>
             <task-card :task="task" v-for="task in tasksClosed" :key="task.name"></task-card>
+          </transition-group>
           </div>
         </div>
       </div>
@@ -129,7 +146,10 @@
             { name: 'task 2', status: 1, assignee: '🐶', mandays: 2 },
             { name: 'task 3', status: 2, assignee: '🐱', mandays: 1 },
             { name: 'task 4', status: 3, assignee: '🐹', mandays: 1 }
-          ]
+          ],
+          newTaskName: '',
+          newTaskAssignee: null,
+          newTaskMandays: 0
         },
         computed: {
           tasksOpen() {
@@ -140,6 +160,11 @@
           },
           tasksClosed() {
             return filters.closed(this.tasks)
+          }
+        },
+        methods: {
+          addTask () {
+            this.tasks.push({ name: this.newTaskName, status: 1, assignee: this.newTaskAssignee, mandays: this.newTaskMandays })
           }
         }
       })
